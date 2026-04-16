@@ -1,15 +1,18 @@
 #pragma once
 
-#include <iostream>
-#include <sys/socket.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
-class TcpSocket{
+class TcpSocket {
 public:
-    ~TcpSocket(){};
-    
-    bool ConnectTo(const std::string& host, uint16_t port, int timeoutMs = 5000);
+    ~TcpSocket() { CloseSocket(); }
+
+    bool ConnectTo(const std::string& host, uint16_t port, int timeoutMS = 5000);
+    bool SendAll(const void* data, size_t size);
+    bool GetAll(void* data, size_t size);
+    bool CloseSocket();
+
 private:
-    int sock;
+    int sock = -1;
 };
