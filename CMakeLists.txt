@@ -13,6 +13,7 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
 endif()
 
 find_package(Threads REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 # Core library: everything from src except src/app.
 file(GLOB_RECURSE VBV_CORE_SOURCES CONFIGURE_DEPENDS
@@ -30,8 +31,11 @@ list(FILTER VBV_CORE_HEADERS EXCLUDE REGEX "/src/app/")
 
 if(VBV_CORE_SOURCES)
     add_library(vnc_core STATIC ${VBV_CORE_SOURCES} ${VBV_CORE_HEADERS})
-    target_include_directories(vnc_core PUBLIC "${PROJECT_SOURCE_DIR}/include")
-    target_link_libraries(vnc_core PUBLIC Threads::Threads)
+    target_include_directories(vnc_core
+        PUBLIC "${PROJECT_SOURCE_DIR}/include"
+        PRIVATE "${OPENSSL_INCLUDE_DIR}"
+    )
+    target_link_libraries(vnc_core PUBLIC Threads::Threads OpenSSL::Crypto)
     source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${VBV_CORE_SOURCES} ${VBV_CORE_HEADERS})
 endif()
 

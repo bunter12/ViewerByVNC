@@ -22,6 +22,15 @@ struct PIXEL_FORMAT{
     std::array<uint8_t, 3> padding;
 };
 
+enum ClietnToServerMessage{
+    SetPixelFormat              = 0,
+    SetEncodings                = 2,
+    FramebufferUpdateRequest    = 3,
+    KeyEvent                    = 4,
+    PointerEvent                = 5,
+    ClientCutText               = 6
+};
+
 struct ServerInit{
     uint16_t width;
     uint16_t height;
@@ -38,7 +47,32 @@ public:
     bool Handshake();
     bool SecurityHandshake();
     bool Init();
+    
+    bool SetPixelFormat();
+    bool SetEncodings();
+    bool FramebufferUpdateRequest();
+    bool ReceiveFramebufferUpdate(std::vector<uint8_t>& frameBuffer);
+    const ServerInit& GetInitData() const { return InitData; }
+    bool KeyEvent();
+    bool PointerEvent();
+    bool ClientCutText();
+    bool RunGetImageFromServer();
 private:
+    bool DecodeRawRectangle(std::vector<uint8_t>& frameBuffer,
+                            uint16_t x,
+                            uint16_t y,
+                            uint16_t width,
+                            uint16_t height);
+    bool DecodeRectangleByEncoding(int32_t encodingType,
+                                   std::vector<uint8_t>& frameBuffer,
+                                   uint16_t x,
+                                   uint16_t y,
+                                   uint16_t width,
+                                   uint16_t height);
+
+    int protocolMajor = 3;
+    int protocolMinor = 8;
+
     ServerInit InitData;
     TcpSocket* tcp;
 };
